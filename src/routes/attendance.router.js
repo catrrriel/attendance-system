@@ -1,14 +1,31 @@
 import { Router } from "express";
 import { markEntry } from "../controllers/attendance.controller.js";
+import { markExit } from "../controllers/attendance.controller.js";
+import { getStatus } from "../services/attendance.service.js";
+import attendanceStore from "../services/attendance.store.js";
 
 const router = Router();
 
-//endpoint real
-router.get('/entry', markEntry);
+//endpoints qr
+router.post('/entry', markEntry);
+router.post('/exit', markExit);
+
 
 //endpoint test
-//router.get('/test', (req, res)=>{
-//    res.json({ok:true, qsy:912, msg:'attendance routes funcionan'})
-//})
+router.get('/:alumnoId', (req, res)=>{
+    const { alumnoId } = req.params;
+    const alumnoIdStr = String(alumnoId ?? '').trim();
+    const record = attendanceStore[alumnoIdStr];
+
+    if(!record){
+        return res.json({status:'ausente'})
+    }
+
+    res.json({
+        alumnoId,
+        ...record,
+        status: getStatus(record)
+    })
+})
 
 export default router;
