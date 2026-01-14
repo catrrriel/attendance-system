@@ -1,13 +1,10 @@
 // const express = require('express'); <= manera antigua.
 import express from 'express';
-import dotenv from 'dotenv';
 import attendancerRoutes from './src/routes/attendance.router.js';
-
-dotenv.config();
+import { ENV } from './src/config/env.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
+const PORT = ENV.PORT || 3001;
 
 //middleware para json
 app.use(express.json());
@@ -21,7 +18,7 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
-    console.log('PORT desde env:', process.env.PORT);
+    console.log('PORT desde env:', ENV.PORT);
 });
 
 

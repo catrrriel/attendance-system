@@ -1,66 +1,55 @@
-import attendanceStore from "../services/attendance.store.js";
+import { registerEntry, registerExit } from '../services/attendance.service.js';
+import { validateAttendanceBody } from './attendance.validators.js';
 
 export const markEntry = (req, res) => {
-    const {alumnoId, qrToken, lat, lng} = req.body;
-    const alumnoIdStr = String(alumnoId ?? '').trim();
-
-    if(!alumnoId || !qrToken){
-        return res.status(400).json({
-            ok:false,
-            msg:'datos incompletos'
+    try{
+        const validate = validateAttendanceBody(req.body);
+        const data = registerEntry({
+            alumnoId: validate.alumnoId,
+            qrToken: validate.qrToken,
+            lat: validate.lat,
+            lng: validate.lng
+        });
+        
+        res.json({
+            ok: true,
+            msg: 'Entrada registrada',
+            data
+        });
+    } catch (err) {
+        res.status(err.status || 500).json({
+            ok: false,
+            error: {
+                code: err.code || 'INTERNAL_ERROR',
+                msg: err.message
+            }
         });
     };
-
-    if(!attendanceStore[alumnoIdStr]){
-        attendanceStore[alumnoIdStr] = {
-            entry:null,
-            exit:null
-        }
-    }
-
-    attendanceStore[alumnoIdStr].entry = new Date();
-    
-    //aca hay que:
-    //-validar QR de entrada
-    //-validar ubic
-    //-registrar entrada
-    console.log(attendanceStore);
-
-    res.json({
-        ok:true,
-        msg:'entrada registrada',
-        data:attendanceStore[alumnoIdStr]
-    });
 };
 
 export const markExit = (req, res) => {
-    const {alumnoId, qrToken, lat, lng} = req.body;
-    const alumnoIdStr = String(alumnoId ?? '').trim();
-    if(!alumnoId || !qrToken){
-        return res.status(400).json({
-            "ok":false,
-            "msg":'datos incompletos'
+    try {
+        const validate = validateAttendanceBody(req.body);
+        const data = registerExit({
+            alumnoId: validate.alumnoId,
+            qrToken: validate.qrToken,
+            lat: validate.lat,
+            lng: validate.lng
+        });
+
+        res.json({
+            ok: true,
+            msg: 'Salida registrada',
+            data
+        });
+    } catch (err) {
+        res.status(err.status || 500).json({
+            ok: false,
+            error: {
+                code: err.code || 'INTERNAL_ERROR',
+                msg: err.message
+            }
         });
     };
-
-    if(!attendanceStore[alumnoIdStr]){
-        attendanceStore[alumnoIdStr] = {
-            entry:null,
-            exit:null
-        }
-    }
-
-    attendanceStore[alumnoIdStr].exit = new Date();
-
-    //aca hay que:
-    //-validar QR de salida
-    //-validar ubic
-    //-registrar salida
-
-    res.json({
-        ok:true,
-        msg:'salida registrada',
-        data:attendanceStore[alumnoIdStr]
-    });
-}
+};
 
