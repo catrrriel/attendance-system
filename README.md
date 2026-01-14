@@ -60,8 +60,8 @@ El proyecto sigue una arquitectura en capas:
 
 ## Instalación y uso
 
-npm install
-npm run dev
+- npm install
+- npm run dev
 
 ----
 
