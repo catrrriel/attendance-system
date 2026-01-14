@@ -7,5 +7,5 @@ export const ENV = {
     QR_EXIT_TOKEN: process.env.QR_EXIT_TOKEN,
     UNIVERSITY_LAT: Number(process.env.UNIVERSITY_LAT),
     UNIVERSITY_LNG: Number(process.env.UNIVERSITY_LNG),
-    MAX_DISTANCE: Number(process.env.MAX_DISTANCE ?? 50),
+    MAX_DISTANCE: Number(process.env.MAX_DISTANCE ?? 100),
 };

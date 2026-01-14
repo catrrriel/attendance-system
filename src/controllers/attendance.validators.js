@@ -16,7 +16,7 @@ export function validateAttendanceBody (body){
     const lngNum = Number(lng);
 
     if(Number.isNaN(latNum) || Number.isNaN(lngNum)){
-        const err = new Error('lat/lng invalidas');
+        const err = new Error('Lat/Lng invalidas');
         err.status = 400;
         err.code = 'BAD_REQUEST';
         throw err;
