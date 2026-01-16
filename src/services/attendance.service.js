@@ -7,6 +7,7 @@ import {
 } from '../repositories/attendance.repository.js';
 import { ENV } from '../config/env.js';
 import { validateDistance } from './attendance.geo.service.js';
+import { AppError } from '../errors/AppError.js';
 
 export async function registerEntry({alumnoId, qrToken, lat, lng, classSessionId}){
     if(qrToken !== ENV.QR_ENTRY_TOKEN){
@@ -82,14 +83,8 @@ export const getStatus = ({entryAt, exitAt}) => {
 
 //helpers internos
 function throwUnauthorized(msg){
-    const e = new Error(msg);
-    e.status = 401;
-    e.code = 'UNAUTHORIZED';
-    throw e;
+    throw new AppError(msg, 401, 'UNAUTHORIZED');
 }
 function throwConflict(msg){
-    const e = new Error(msg);
-    e.status = 409;
-    e.code = 'CONFLICT';
-    throw e;
+    throw new AppError(msg, 409, 'CONFLICT');
 }

@@ -17,11 +17,9 @@ app.get("/", (req, res) => {
     res.send("hola mundo anashe");
 });
 
+app.use(errorHandler);
+
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`);
     console.log('PORT desde env:', ENV.PORT);
 });
-
-app.use(errorHandler);
-
-

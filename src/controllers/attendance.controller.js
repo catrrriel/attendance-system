@@ -1,8 +1,9 @@
 import { registerEntry, registerExit } from '../services/attendance.service.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { getAttendanceStatus } from '../services/attendance.status.service.js';
 
 export const markEntry = asyncHandler(async(req, res) => {
-    const data = registerEntry(req.attendance);
+    const data = await registerEntry(req.attendance);
         
     res.json({
         ok: true,
@@ -12,7 +13,7 @@ export const markEntry = asyncHandler(async(req, res) => {
 });
 
 export const markExit = asyncHandler(async (req, res) => {
-    const data = registerExit(req.attendance);
+    const data = await registerExit(req.attendance);
 
     res.json({
         ok: true,
@@ -21,3 +22,13 @@ export const markExit = asyncHandler(async (req, res) => {
     });
 });
 
+export const getStatusController = asyncHandler(async (req, res) => {
+    const { studentId, classSessionId } = req.params;
+
+    const data = await getAttendanceStatus(studentId, Number(classSessionId));
+
+    res.json({
+        ok:true,
+        data
+    });
+});

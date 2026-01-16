@@ -28,7 +28,8 @@ La lógica está diseñada para permitir:
 - Express.js
 - JavaScript (ES Modules)
 - dotenv
-- Próximamente PostgreSQL
+- PostgreSQL
+- Prisma
 
 ----
 

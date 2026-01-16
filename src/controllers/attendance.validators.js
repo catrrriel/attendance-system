@@ -17,7 +17,7 @@ export function validateAttendanceBody (body){
     const classSessionIdNum = Number(classSessionId);
 
     if(Number.isNaN(latNum) || Number.isNaN(lngNum) || Number.isNaN(classSessionIdNum)){
-        const err = new Error('Datos invalidas');
+        const err = new Error('Datos invalidos');
         err.status = 400;
         err.code = 'BAD_REQUEST';
         throw err;
