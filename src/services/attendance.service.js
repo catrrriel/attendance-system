@@ -1,52 +1,82 @@
-import attendanceStore from './attendance.store.js';
+import {
+    findStudentById,
+    createStudent,
+    findAttendance,
+    createAttendance,
+    updateAttendance
+} from '../repositories/attendance.repository.js';
 import { ENV } from '../config/env.js';
 import { validateDistance } from './attendance.geo.service.js';
 
-//si no existe el alumnoId en store, se crea en estado null
-function initStudent (id) {
-    if(!attendanceStore[id]){
-        attendanceStore[id] = {
-            entry:null,
-            exit:null
-        }
-    };
-};
-
-export function registerEntry({alumnoId, qrToken, lat, lng}){
+export async function registerEntry({alumnoId, qrToken, lat, lng, classSessionId}){
     if(qrToken !== ENV.QR_ENTRY_TOKEN){
         throwUnauthorized('QR de entrada invalido');
-    }
+    };
 
     validateDistance(lat, lng);
-    initStudent(alumnoId);
+    
+    let student = await findStudentById(alumnoId);
+    if(!student){
+        student = await createStudent(alumnoId);
+    };
 
-    if(attendanceStore[alumnoId].entry){
+    let attendance = await findAttendance(alumnoId, classSessionId);
+    
+    if(attendance?.entryAt){        // == if(attendance && attendance.entryAt)
         throwConflict('Entrada ya registrada');
-    }
+    };
 
-    attendanceStore[alumnoId].entry = new Date();
-    return attendanceStore[alumnoId];
-}
+    if(!attendance){
+        attendance = await createAttendance({
+            studentId: alumnoId,
+            classSessionId,
+            entryAt: new Date()
+        });
+    } else {
+        attendance = await updateAttendance(attendance.id, {
+            entryAt: new Date()
+        });
+    };
 
-export function registerExit({alumnoId, qrToken, lat, lng}){
+    return attendance;
+};
+
+export async function registerExit({alumnoId, qrToken, lat, lng, classSessionId}){
     if(qrToken !== ENV.QR_EXIT_TOKEN){
         throwUnauthorized('QR de salida invalido');
     }
 
     validateDistance(lat, lng);
-    initStudent(alumnoId);
 
-    if(attendanceStore[alumnoId].exit){
+    let student = await findStudentById(alumnoId);
+    if(!student){
+        student = await createStudent(alumnoId);
+    };
+
+    let attendance = await findAttendance(alumnoId, classSessionId);
+    
+    if(attendance?.exitAt){        // == if(attendance && attendance.exitAt)
         throwConflict('Salida ya registrada');
-    }
+    };
 
-    attendanceStore[alumnoId].exit = new Date();
-    return attendanceStore[alumnoId];
+    if(!attendance){
+        attendance = await createAttendance({
+            studentId: alumnoId,
+            classSessionId,
+            exitAt: new Date()
+        });
+    } else {
+        attendance = await updateAttendance(attendance.id, {
+            exitAt: new Date()
+        });
+    };
+
+    return attendance;
 }
 
-export const getStatus = ({entry, exit}) => {
-    if(entry && exit) return 'Presente';
-    if(entry || exit) return 'Media falta';
+export const getStatus = ({entryAt, exitAt}) => {
+    if(entryAt && exitAt) return 'Presente';
+    if(entryAt || exitAt) return 'Media falta';
     return 'Ausente';
 }
 

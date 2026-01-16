@@ -1,11 +1,11 @@
 import { normalizeStr } from "../utils/normalize.js";
 
 export function validateAttendanceBody (body){
-    const {alumnoId, qrToken, lat, lng} = body;
+    const {alumnoId, qrToken, lat, lng, classSessionId} = body;
 
     const alumnoIdStr = normalizeStr(alumnoId);
 
-    if(!alumnoIdStr || !qrToken || lat == null || lng == null){
+    if(!alumnoIdStr || !qrToken || lat == null || lng == null || classSessionId == null){
         const err = new Error('Datos incompletos');
         err.status = 400;
         err.code = 'BAD_REQUEST';
@@ -14,9 +14,10 @@ export function validateAttendanceBody (body){
 
     const latNum = Number(lat);
     const lngNum = Number(lng);
+    const classSessionIdNum = Number(classSessionId);
 
-    if(Number.isNaN(latNum) || Number.isNaN(lngNum)){
-        const err = new Error('Lat/Lng invalidas');
+    if(Number.isNaN(latNum) || Number.isNaN(lngNum) || Number.isNaN(classSessionIdNum)){
+        const err = new Error('Datos invalidas');
         err.status = 400;
         err.code = 'BAD_REQUEST';
         throw err;
@@ -30,10 +31,18 @@ export function validateAttendanceBody (body){
         throw err;
     }
 
+    if(!Number.isInteger(classSessionIdNum) || classSessionIdNum <= 0){
+        const err = new Error('classSessionId invalido');
+        err.status = 400;
+        err.code = 'BAD_REQUEST';
+        throw err;
+    }
+
     return {
         alumnoId: alumnoIdStr,
         qrToken,
         lat: latNum,
-        lng: lngNum
+        lng: lngNum,
+        classSessionId: classSessionIdNum
     };
 }

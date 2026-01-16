@@ -3,8 +3,9 @@ import { markEntry } from "../controllers/attendance.controller.js";
 import { markExit } from "../controllers/attendance.controller.js";
 import { getStatus } from "../services/attendance.service.js";
 import { normalizeStr } from "../utils/normalize.js";
-import attendanceStore from "../services/attendance.store.js";
 import { validateAttendance } from "../middlewares/validateAttendance.middleware.js";
+import { asyncHandler } from "../middlewares/asyncHandler.js";
+import { findAttendance } from "../repositories/attendance.repository.js";
 
 const router = Router();
 
@@ -14,20 +15,22 @@ router.post('/exit', validateAttendance, markExit);
 
 
 //endpoint test
-router.get('/:alumnoId', (req, res)=>{
-    const { alumnoId } = req.params;
-    const alumnoIdStr = normalizeStr(alumnoId);
-    const record = attendanceStore[alumnoIdStr];
+router.get('/:studentId/:classSessionId',asyncHandler(async (req, res)=>{
+    const { studentId, classSessionId } = req.params;
+    //const alumnoIdStr = normalizeStr(alumnoId);
+    const attendance = await findAttendance(
+        studentId,
+        Number(classSessionId)
+    );
 
-    if(!record){
+    if(!attendance){
         return res.json({status: 'ausente'})
     }
 
     res.json({
-        alumnoId,
-        ...record,
-        status: getStatus(record)
-    })
-})
+        status: getStatus(attendance),
+        attendance
+    });
+}));
 
 export default router;
